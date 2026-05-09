@@ -312,7 +312,7 @@ class Submitter (object):
                     max_per_interval)
 
         for n, (command, label) in enumerate (zip (commands, command_labels)):
-            dag_label = 'npx4_{0}.sh'.format (label)
+            dag_label = 'condor00_{0}.sh'.format (label)
             dag_label = re.sub (r'\.', '_dot_', dag_label)
             dag_label = re.sub (r'\+', '_plus_', dag_label)
             dag_label = re.sub (r'-', '_minus_', dag_label)
@@ -410,17 +410,17 @@ class Submitter (object):
             print ('Prepared {} jobs\n in {} .'.format (n_total, job_dir))
             self.log (condor00_command)
 
-    def submit_npx4 (self, commands, command_labels,
+    def submit_npx (self, commands, command_labels,
                      username=None, reqs=None,
                      blacklist=[], gpus = None):
-        """Submit jobs in parallel on the npx4 Condor cluster.
+        """Submit jobs in parallel on the npx Condor cluster.
 
-        This method logs into pub.icecube.wisc.edu, then into npx4.  There, it
+        This method logs into pub.icecube.wisc.edu, then into npx.  There, it
         executes the given command(s) on the cluster with condor_submit.
 
         `commands`: a sequence of commands, or a single command.
         `command_labels`: a sequence of command labels, or a single one.
-        `username`: the username in use on npx4.
+        `username`: the username in use on npx.
         """
         if len (set (command_labels)) != len (command_labels):
             raise ValueError (
@@ -435,9 +435,9 @@ class Submitter (object):
         length = len (str (n_total))
 
         subdag_filename = os.path.realpath ((os.path.join (
-                job_dir, 'npx4_submit.dag')))
+                job_dir, 'npx_submit.dag')))
         subdag_config_filename = os.path.realpath ((os.path.join (
-                job_dir, 'npx4_submit.dag.config')))
+                job_dir, 'npx_submit.dag.config')))
         subdag = open (subdag_filename, 'w')
         subdag_config = open (subdag_config_filename, 'w')
 
@@ -449,7 +449,7 @@ class Submitter (object):
         spr_dag_config ('DAGMAN_MAX_SUBMITS_PER_INTERVAL = 50')
 
         for n, (command, label) in enumerate (zip (commands, command_labels)):
-            dag_label = 'npx4_{0}.sh'.format (label)
+            dag_label = 'npx_{0}.sh'.format (label)
             dag_label = re.sub (r'\.', '_dot_', dag_label)
             dag_label = re.sub (r'\+', '_plus_', dag_label)
             dag_label = re.sub (r'-', '_minus_', dag_label)
@@ -528,37 +528,37 @@ class Submitter (object):
         subdag_config.close ()
 
         print ('Submitting jobs from {0} ...'.format (job_dir))
-        if 'submit-1' in hostname:
+        if 'npx-submitter' in hostname:
             if self.max_jobs:
-                npx4_command = 'condor_submit_dag -maxjobs {0} {1}'.format (
+                npx_command = 'condor_submit_dag -maxjobs {0} {1}'.format (
                     self.max_jobs, os.path.realpath (subdag_filename))
             else:
-                npx4_command = 'condor_submit_dag {0}'.format (
+                npx_command = 'condor_submit_dag {0}'.format (
                     os.path.realpath (subdag_filename))
         elif 'cobalt' in hostname:
             if self.max_jobs:
-                npx4_command = 'ssh submit "condor_submit_dag -maxjobs {0} {1}"'.format (
+                npx_command = 'ssh npx-submitter "condor_submit_dag -maxjobs {0} {1}"'.format (
                     self.max_jobs, os.path.realpath (subdag_filename))
             else:
-                npx4_command = 'ssh submit "condor_submit_dag {0}"'.format (
+                npx_command = 'ssh npx-submitter "condor_submit_dag {0}"'.format (
                     os.path.realpath (subdag_filename))
         else:
             if self.max_jobs:
-                npx4_command = 'ssh {0}pub.icecube.wisc.edu "ssh submit ' \
+                npx_command = 'ssh {0}pub.icecube.wisc.edu "ssh npx-submitter ' \
                         '\'condor_submit_dag -maxjobs {1} {2}\' "'.format (
                             user_str, self.max_jobs, self.max_jobs,
                             os.path.realpath (subdag_filename))
             else:
-                npx4_command = 'ssh {0}pub.icecube.wisc.edu "ssh submit ' \
+                npx_command = 'ssh {0}pub.icecube.wisc.edu "ssh npx-submitter ' \
                         '\'condor_submit_dag {1}\' "'.format (
                             user_str,
                             os.path.realpath (subdag_filename))
         if not self.dry:
             print ('Submitting {0} jobs.'.format (n_total))
-            os.system (npx4_command)
+            os.system (npx_command)
         else:
             print ('Prepared {0} jobs.'.format (n_total))
-            self.log (npx4_command)
+            self.log (npx_command)
 
     def submit_osg (self, commands, command_labels,
                     transfers='',
@@ -775,7 +775,7 @@ class Submitter (object):
                     max_per_interval)
 
         for n, (command, label) in enumerate (zip (commands, command_labels)):
-            dag_label = 'npx4_{0}.sh'.format (label)
+            dag_label = 'illume_{0}.sh'.format (label)
             dag_label = re.sub (r'\.', '_dot_', dag_label)
             dag_label = re.sub (r'\+', '_plus_', dag_label)
             dag_label = re.sub (r'-', '_minus_', dag_label)
