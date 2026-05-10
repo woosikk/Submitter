@@ -495,7 +495,7 @@ class Submitter (object):
                 pr ('Output         = {}/{}.out'.format (log_dir, dag_label))
                 pr ('Error          = {}/{}.err'.format (log_dir, dag_label))
                 pr ('Notification   = NEVER')
-                if 'submit-1' in hostname:
+                if 'npx-submitter' in hostname:
                     pr ('should_transfer_files = YES')
                     #pr ('when_to_transfer_output = ON_EXIT')
                     pr ('stream_output = True')
