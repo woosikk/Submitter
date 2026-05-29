@@ -411,8 +411,10 @@ class Submitter (object):
             self.log (condor00_command)
 
     def submit_npx (self, commands, command_labels,
-                     username=None, reqs=None,
-                     blacklist=[], gpus = None):
+                    username=None, reqs=None,
+                    blacklist=[], gpus = None,
+                    extensive=None, priority=None
+                   ):
         """Submit jobs in parallel on the npx Condor cluster.
 
         This method logs into pub.icecube.wisc.edu, then into npx.  There, it
@@ -421,6 +423,9 @@ class Submitter (object):
         `commands`: a sequence of commands, or a single command.
         `command_labels`: a sequence of command labels, or a single one.
         `username`: the username in use on npx.
+        'extensive': standard job with extended duration; '1' or '2' for 1 week or 2 weeks, respectively.
+        'priority': specify low or high priority job - need special permission for high priority; 
+                    "backfill" or "sanctioned" for low or high priorities, respectively. 
         """
         if len (set (command_labels)) != len (command_labels):
             raise ValueError (
@@ -512,11 +517,16 @@ class Submitter (object):
                         pr('Requirements = {}'.format(reqs))
                 if gpus:
                     pr ('request_gpus = 1')
-
                 if self.memory:
-                    pr ('request_memory = {0:.2f}G'.format (self.memory))
+                    pr ('request_memory = {0:.2f}G'.format(self.memory))
                 if self.ncpu:
-                    pr ('request_cpus = {0:.0f}'.format (self.ncpu))
+                    pr ('request_cpus = {0:.0f}'.format(self.ncpu))
+                    
+                if priority in ("backfill", "sanctioned"):
+                    pr ('accounting_group = {}'.format(priority))
+                elif extensive in (1, 2):
+                    pr ('accounting_group = {}_week'.format(extensive))
+                    
                 pr ('Queue')
 
             user_str = username + '@' if username else ''
